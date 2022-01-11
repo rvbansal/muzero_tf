@@ -15,7 +15,11 @@ from muzero_network import MuZeroNetwork, NetworkOutput
 from model_utils import scale_gradient, soft_network_params_update
 from replay_memory import ReplayMemory
 from test_runner import test
-from ray_constants import FRAC_CPUS_PER_WORKER, FRAC_GPUS_PER_WORKER
+from ray_constants import (
+    FRAC_CPUS_PER_WORKER, 
+    FRAC_GPUS_PER_WORKER,
+    TEST_EVALS_MULT
+)
 
 
 train_logger = logging.getLogger("train")
@@ -205,7 +209,10 @@ def store_predictions(
     return step_log_data
 
 
-@ray.remote(num_gpus=FRAC_GPUS_PER_WORKER, num_cpus=FRAC_CPUS_PER_WORKER)
+@ray.remote(
+    num_gpus=TEST_EVALS_MULT*FRAC_GPUS_PER_WORKER, 
+    num_cpus=TEST_EVALS_MULT*FRAC_CPUS_PER_WORKER
+)
 def run_test_evals(config: 'MuZeroConfig', storage: 'CentralActorStorage'):
     best_test_score = float('-inf')
 
